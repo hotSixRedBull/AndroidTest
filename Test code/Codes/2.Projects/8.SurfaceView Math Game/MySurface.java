@@ -1,11 +1,16 @@
-package com.tutorial.hotsixredbull.mygumi;
+package com.fifthday.hotsixredbull.mygumi;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.SurfaceHolder;
@@ -14,7 +19,6 @@ import android.view.WindowManager;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.jar.Attributes;
 
 public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
     MyThread mThread;
@@ -89,7 +93,7 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
     SoundPool sPool;
     int dingdongdang,taeng;
     public MySurface(Context context, AttributeSet attrs){
-        super(context,this);
+        super(context,attrs);
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
 
@@ -110,7 +114,7 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
 
         balloon = new ArrayList<Balloon>();
         button_width=width/6;
-        basket = BitmapFactory.decodeResource(getResources(),R.drawable.baskethand);
+        basket = BitmapFactory.decodeResource(getResources(),R.drawable.handpoint);
         int x  = width/4;
         int y = x;
         basket = Bitmap.createScaledBitmap(basket,x,y,true);
@@ -147,7 +151,7 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
         menuButton_x = width - button_width*5/4;
         menuButton_y = height/30;
 
-        helpButton = BitmapFactory.decodeResource(getResources(),R.drawable.helpButton);
+        helpButton = BitmapFactory.decodeResource(getResources(),R.drawable.help);
         helpButton = Bitmap.createScaledBitmap(helpButton,button_width,button_width,true);
         helpButton_x = width - button_width*5/4;
         helpButton_y = height/8;
@@ -207,10 +211,10 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
         closeButton_x = width*2/3 - button_width/2;
         closeButton_y = plusicon_y+button_width*13/2;
 
-        scoreImage = BitmapFactory.decodeResource(getResources(),R.drawable.scoreImage);
+        scoreImage = BitmapFactory.decodeResource(getResources(),R.drawable.score);
         scoreImage = Bitmap.createScaledBitmap(scoreImage,button_width,button_width,true);
 
-        resultShow = BitmapFactory.decodeResource(getResources(),R.drawable.resultShow);
+        resultShow = BitmapFactory.decodeResource(getResources(),R.drawable.resultshow);
         resultShow = Bitmap.createScaledBitmap(resultShow,width*2/3,height/3,true);
         resultShow_x = button_width;
         resultShow_y = button_width/2;
@@ -241,6 +245,94 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
             makeQuestion();
         }
 
+        public void drawEveryThing(Canvas canvas){
+            if(balloon.size()<4){
+                Random r1 = new Random();
+                int x = r1.nextInt(width-button_width);
+                int y = r1.nextInt(height/4);
+                balloon.add(new Balloon(x,-y,balloon_speed));
+            }
+
+            Paint p1 = new Paint();
+            Paint p2 = new Paint();
+            Paint p3 = new Paint();
+            Paint p4 = new Paint();
+
+            p1.setColor(Color.WHITE);
+            p1.setTextSize(width/14);
+
+            p2.setColor(Color.WHITE);
+            p2.setTextSize(width/14);
+            p2.setAlpha(100);
+
+            p3.setColor(Color.BLUE);
+            p3.setTextSize(width/12);
+
+            p4.setColor(Color.BLACK);
+            p4.setTextSize(width/14);
+
+            Paint pp = new Paint();
+            pp.setColor(0xFFFFD9EC);
+            
+            canvas.drawRect(0,0,width,height,pp);
+            canvas.drawText("남은 시간 : "+Integer.toString(count/50),0,height/7,p4);
+            canvas.drawText("점수 : "+Integer.toString(score),0,height/5,p4);
+            
+            if(operator==0)answer=number1+number2;
+            else if(operator==1) answer = number1-number2;
+            else answer = number1*number2;
+            
+            if(operator==0)
+                canvas.drawText("문제 : "+Integer.toString(number1)+"+"+Integer.toString(number2),0,height/13,p3);
+            else if(operator==1)
+                canvas.drawText("문제 : "+Integer.toString(number1)+"-"+Integer.toString(number2),0,height/13,p3);
+            else
+                canvas.drawText("문제 : "+Integer.toString(number1)+"*"+Integer.toString(number2),0,height/13,p3);
+            
+            if(basket_x<0) basket_x = 0;
+            if(basket_x+balloonWidth>width) basket_x = width - basketWidth;
+            
+            canvas.drawBitmap(basket,basket_x,basket_y,p1);
+            canvas.drawBitmap(leftKey,leftKey_x,leftKey_y,p1);
+            canvas.drawBitmap(rightKey,rightKey_x,rightKey_y,p1);
+            
+            for(Balloon tmp : balloon)
+                canvas.drawBitmap(balloonimg,tmp.x,tmp.y,p1);
+            
+            for(int i=balloon.size()-1;i>=0;i--)
+                canvas.drawText(Integer.toString(wrongNumber[i]),balloon.get(i).x+balloonWidth/6,balloon.get(i).y+balloonWidth*2/3,p1);
+            
+            canvas.drawBitmap(balloonimg,answerBalloon.x,answerBalloon.y,p1);
+            canvas.drawText(Integer.toString(answer),answerBalloon.x+balloonWidth/6,answerBalloon.y+balloonWidth*2/3,p1);
+            
+            if(answerBalloon.y>height)
+                answerBalloon.y = -50;
+            if(menuOk==0)
+                moveBalloon();
+            if(menuOk==0)
+                checkCollision();
+            if(menuOk==0)
+                count--;
+            
+            if(count<0){
+                menuOk=3;
+                count=timeValue*1500+1500;
+                if(timeValue==2) count=6000;
+            }
+            
+            if(menuOk==0)
+                count--;
+            
+            if(count<0){
+                menuOk=3;
+                count = timeValue*1500+1500;
+                if(timeValue==2)count=6000;
+            }
+            if(menuOk==0)
+                canvas.drawBitmap(menuButton,menuButton_x,menuButton_y,p1);
+            
+            
+        }
         public void makeQuestion(){
             Random r1 = new Random();
             int x = r1.nextInt(99)+1;
