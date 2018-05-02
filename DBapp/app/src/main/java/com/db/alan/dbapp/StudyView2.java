@@ -65,7 +65,7 @@ public class StudyView2 extends SurfaceView implements Callback {
     static StudyThread mThread;
     SurfaceHolder mHolder;
     static Context mContext;
-    FileTable mFile;
+    FileTable mFile2;
 
     MyDBHelper m_helper;
 
@@ -140,77 +140,72 @@ public class StudyView2 extends SurfaceView implements Callback {
         mContext = context;
         mThread = new StudyThread(holder, context);
 
-        gestureScanner = new GestureDetector(this);
-
         initAll();
-        makeQuestion(subNumber);
+        makeQuestion(level);
         setFocusable(true);
     }
 
     private void initAll() {
-        m_helper = new MyDBHelper(mContext, "testforeng.db", null, 1);
+        m_helper = new DBHelper(mContext, "test.db", null, 1);
         Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         width = display.getWidth();
         height = display.getHeight();
-        textSizeChanging = (int) (width * 64 / 1280);
-        if (width > 1700) textSizeForG4 = 120;
 
-        mFile = new FileTable();
+        mFile2 = new FileTable();
 
-        btnNext = new MyButton1(30, 14 + 20, 0);
+        btnNum1 = new MyButton2(width/14, height/3, 7);
+        btnNum2 = new MyButton2(btnNum1.x,btnNum1.y+btnNum1.h*2+8,8);
+        btnNum3 = new MyButton2(btnNum2.x,btnNum2.y+btnNum2.h*2+8, 9);
+        btnNum4 = new MyButton2(btnNum3.x,btnNum3.y+btnNum3.h*2+8, 10);
+        btnNum5 = new MyButton2(btnNum4.x,btnNum4.y+btnNum4.h*2+8, 11);
 
-        btnPrevious = new MyButton1(btnNext.x + btnNext.w * 2, 14 + 20, 1);
-        btnWordSelection = new MyButton1(btnPrevious.x + btnNext.w * 2, 14 + 20, 2);
-        btnMyNote = new MyButton1(btnWordSelection.x + btnNext.w * 2, 14 + 20, 4);
+        btnSetting = new MyButton2(width - btnNum1.w*8, btnNum1.h, 14);
+        btnExit = new MyButton2(width - btnSetting.w*3, btnSetting.y, 5);
 
-        btnExit = new MyButton1(width - btnNum1.w * 2 - btnNext.w / 3, 14 + 20, 5);
-        btnRandom = new MyButton1(btnMyNote.x + btnNext.w * 2, 14 + 20, 6);
-        btnNum1 = new MyButton1(btnNext.x + 120, btnNext.y + btnNext.h * 2 + 93, 7);
-        btnNum2 = new MyButton1(btnNext.x + 120, btnNum1.y + btnNum1.h * 2 + 8, 8);
-        btnNum3 = new MyButton1(btnNext.x + 120, btnNum2.y + btnNum2.h * 2 + 8, 9);
-        btnNum4 = new MyButton1(btnNext.x + 120, btnNum3.y + btnNum3.h * 2 + 8, 10);
-        btnNum5 = new MyButton1(btnNext.x + 120, btnNum4.y + btnNum4.h * 2 + 8, 11);
+        testtitle = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.testtitle);
+        testtitle = Bitmap.createScaledBitmap(testtitle,btnSetting.w*6,btnSetting.h*2,true);
 
-        btnNextQuestion = new MyButton1(width - btnWordSelection.w * 6, btnNum1.y + btnNum1.h * 2 + 1, 12);
-        btnSolveAgain = new MyButton1(width - btnWordSelection.w * 6, btnNextQuestion.y + btnNextQuestion.h * 2 + 1, 13);
-        btnWordSave = new MyButton1(width - btnWordSelection.w * 6, btnSolveAgain.y + btnSolveAgain.h * 2 + 1, 23);
-
-        btnKakaoQSending = new MyButton1(width - btnWordSelection.w * 11, btnNum1.y + btnNum1.h * 2 + 1, 33);
-
-        btnSub1 = new MyButton1(btnPrevious.x + 10, btnWordSelection.y + btnWordSelection.h * 2 + 5, 15);
-        btnSub2 = new MyButton1(btnSub1.x + btnSub1.w * 2, btnSub1.y, 16);
-        btnSub3 = new MyButton1(btnSub2.x + btnSub2.w * 2, btnSub1.y, 17);
-        btnSub4 = new MyButton1(btnSub3.x + btnSub3.w * 2, btnSub1.y, 18);
-        btnSub5 = new MyButton1(btnSub4.x + btnSub4.w * 2, btnSub1.y, 19);
-        btnSub1 = new MyButton1(btnPrevious.x + 10, btnSub1.y + btnSub1.h * 2, 20);
-        btnSub1 = new MyButton1(btnNext.x + 120, btnSub1.y + btnSub1.h * 2, 21);
-        btnSub1 = new MyButton1(btnNext.x + 120, btnSub1.y + btnSub1.h * 2, 22);
+        btnNextQuestion = new MyButton2(width*2/3, height/2, 12);
 
         btnLeftArrow = new MyButton1(btnPrevious.x, height - btnNext.h * 2, 26);
         btnRightArrow = new MyButton1(btnPrevious.x + 150, height - btnNext.h * 2, 27);
 
-        btnClose = new MyButton1(width - btnNext.w * 2, height - btnNext.h * 2, 28);
+        btn10Question= new MyButton2(width/10,height/2,5);
+        btn20Question = new MyButton2(btn10Question.x+btn100Question.w*2,btn10Question.y,6);
+        btn25Question = new MyButton2(btn20Question.x+btn20Question.w*4,btn10Question.y,7);
+        btn50Question = new MyButton2(btn25Question.x+btn25Question.w*6,btn10Question.y,8);
+        btn100Question = new MyButton2(btn100Question.x+btn100Question.w*8,btn10Question.y,9);
 
-        btnForDictionary = new MyButton1[5];
+        btnMenuClose = new MyButton2(width/2+btnSetting.w*3,height-btnSetting.h*3,24);
 
-        for (int i = 0; i < 5; i++) {
-            btnForDictionary[i] = new MyButton1(width - btnNum1.w * 4, btnNum1.h * 4 + i * btnNum1.h * 2 + btnNum1.h / 12 * i, 29);
-        }
+        btnResultConfirm = new MyButton2(width/2+btnSetting.w,height-btnSetting.h*2,25);
 
-        answerx = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.answerx);
+        btnExplain = new MyButton2(width/40,height*7/10,31);
+
+        btnOx = new MyButton2(width/4,btnMenuClose.y,32);
+
+        btnLeftArrow = new MyButton2(btnNum1.w, height-btnNum1.h*3,26);
+        btnRightArrow = new MyButton2(btnLeftArrow.x+btnLeftArrow.w*3,height-btnNum1.h*3, 27);
+
+        btnClose2 = new MyButton2(width-btnNum1.w*3,height-btnNum1.h,28);
+
+        btnDeleteDb = new MyButton2(width*9/10,3,30);
+
+        exitButton = new MyButton2(10,600,4);
 
         int xxx = width / 6;
+        answerx = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.answerx);
         answerx = Bitmap.createScaledBitmap(answerx, xxx, xxx, true);
         answero = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.answero);
         answero = Bitmap.createScaledBitmap(answero, xxx, xxx, true);
         explain = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.explain);
-        explain = Bitmap.createScaledBitmap(explain, width / 11, height / 7, true);
-
-        cap = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.cap);
-        cap = Bitmap.createScaledBitmap(cap, width / 12, height / 14, true);
+        //explain = Bitmap.createScaledBitmap(explain, width / 11, height / 7, true);
 
         chilpan = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.screen1);
         chilpan = Bitmap.createScaledBitmap(chilpan, width, height, true);
+
+        screenPink = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.subscreen00);
+        screenPink = Bitmap.createScaledBitmap(screenPink,width * 2, height-height/5-btnNum1.h/4,true);
 
         for (int i = 0; i < 4; i++) {
             star[i] = BitmapFactory.decodeResource(mContext.getResources(), android.R.drawable.circlewhite);
@@ -220,27 +215,22 @@ public class StudyView2 extends SurfaceView implements Callback {
         sdPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
         dingdongdaeng = sdPool.load(mContext, android.R.raw.dingdongdang, 1);
         taeng = sdPool.load(mContext, android.R.raw.taeng, 2);
-
+        btn10Question.pressed = 1;
     }
 
     public void makeQuestion(int x) {
-        mFile.loadFile(x);
+        mFile2.loadFile2(x);
+        SQLiteDatabase db = m_helper.getWritableDatabase();
+        db.delete("test",null,null);
+        db.close();
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mThread.setRunning(true);
         try {
-            if (mThread.getState() == Thread.State.TERMINATED) {
-                mThread = new StudyThread(getHolder(), mContext);
-                mThread.setRunning(true);
-                setFocusable(true);
-                mThread.start();
-            } else {
-                mThread.start();
-            }
-        } catch (Exception ex) {
-
+            mThread.start();
+        }catch (Exception e){
+            RestartGame();
         }
     }
 
@@ -251,50 +241,36 @@ public class StudyView2 extends SurfaceView implements Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        StopStudy();
-
-        boolean retry = true;
-        mThread.setRunning(false);
-
-        while (retry) {
-            try {
-                mThread.join();
-                retry = false;
-            } catch (Exception e) {
-
-            }
-        }
     }
 
-    public static void StopStudy() {
+    public static void RestartGame() {
         mThread.StopThread();
+        mThread = null;
+        mThread = new StudyThread(mHolder,mContext);
+        mThread.start();
     }
 
     class StudyThread extends Thread {
         boolean canRun = true;
         boolean isWait = false;
+        int loop;
         Paint paint = new Paint();
         Paint paint2 = new Paint();
         Paint paint3 = new Paint();
+        Paint paint4 = new Paint();
+        Paint paint5   = new Paint();
 
         public StudyThread(SurfaceHolder holder, Context context) {
             paint.setColor(Color.WHITE);
             paint.setAntiAlias(true);
+            paint.setTextSize(textSize);
             paint.setTypeface(Typeface.create("", Typeface.BOLD));
-            paint2.setColor(Color.WHITE);
+            paint2.setColor(Color.BLUE);
             paint2.setAntiAlias(true);
             paint2.setTypeface(Typeface.create("", Typeface.BOLD));
-            paint3.setColor(Color.WHITE);
-            paint3.setAntiAlias(true);
-            paint3.setTypeface(Typeface.create("", Typeface.BOLD));
-
-            paint.setTextSize(TypedValue.COMPLEX_UNIT_DIP);
-            paint2.setTextSize(35);
-            paint3.setTextSize(40);
-        }
-
-        public void setRunning(boolean b) {
-
+            paint3.setAlpha(100);
+            paint4.setColor(Color.WHITE);
+            paint5.setColor(Color.RED);
         }
 
         public void DrawAll(Canvas canvas) {
